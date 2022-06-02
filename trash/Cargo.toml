@@ -3,7 +3,7 @@ name = "trash"
 version = "0.1.0"
 edition = "2021"
 authors = ["Tim Cohen <contact@timcohen.dev>"]
-description = "A trash can for cli usage."
+description = "A cli trash utility."
 
 [dependencies]
 ansi_term = "0.12.1"
