@@ -1,0 +1,15 @@
+[package]
+name = "trash"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tim Cohen <contact@timcohen.dev>"]
+description = "A trash can for cli usage."
+
+[dependencies]
+ansi_term = "0.12.1"
+chrono = "0.4.19"
+clap = {version = "3.1.18", features = ["derive"]}
+dialoguer = "0.10.1"
+home = "0.5.3"
+lazy_static = "1.4.0"
+uuid = {version = "1.1.1", features = ["v4"] }
