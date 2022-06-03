@@ -7,12 +7,14 @@ lazy_static! {
 
 pub struct Global {
     verbose: Mutex<bool>,
+    force: Mutex<bool>,
 }
 
 impl Global {
     pub fn new() -> Self {
         Global {
             verbose: Mutex::new(false),
+            force: Mutex::new(false),
         }
     }
     pub fn verbose(&self) -> bool {
@@ -20,6 +22,12 @@ impl Global {
     }
     pub fn set_verbose(&self, verbose: bool) {
         *self.verbose.lock().unwrap() = verbose
+    }
+    pub fn force(&self) -> bool {
+        *self.force.lock().unwrap()
+    }
+    pub fn set_force(&self, force: bool) {
+        *self.force.lock().unwrap() = force
     }
 }
 
