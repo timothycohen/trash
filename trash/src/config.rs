@@ -1,6 +1,9 @@
 use crate::args::{Args, Method};
 use ansi_term::Colour;
-use std::{env, fs, path::PathBuf};
+use std::{
+    env, fs,
+    path::{Component, Path, PathBuf},
+};
 
 #[derive(Debug)]
 pub struct Config {
@@ -47,7 +50,6 @@ impl From<Args> for Config {
                 }
             }
 
-            // todo This doesn't canonicalize paths like /Users/tco/../tco/dev, so it might not find the path in the Trash/info files
             Method::Restore => {
                 // todo. if no path, do an interactive restoration by showing the trash contents
                 let user_path = path_arg_guard(args.file);
@@ -61,6 +63,7 @@ impl From<Args> for Config {
                 };
 
                 let source_path: PathBuf = [pwd, PathBuf::from(user_path)].iter().collect();
+                let source_path = normalize_path(&source_path);
 
                 let file_basename: PathBuf = match source_path.file_name() {
                     Some(f) => f.into(),
@@ -91,4 +94,31 @@ pub fn path_arg_guard(user_path: Option<String>) -> String {
         std::process::exit(1)
     }
     user_path.unwrap()
+}
+
+pub fn normalize_path(path: &Path) -> PathBuf {
+    let mut components = path.components().peekable();
+    let mut ret = if let Some(c @ Component::Prefix(..)) = components.peek().cloned() {
+        components.next();
+        PathBuf::from(c.as_os_str())
+    } else {
+        PathBuf::new()
+    };
+
+    for component in components {
+        match component {
+            Component::Prefix(..) => unreachable!(),
+            Component::RootDir => {
+                ret.push(component.as_os_str());
+            }
+            Component::CurDir => {}
+            Component::ParentDir => {
+                ret.pop();
+            }
+            Component::Normal(c) => {
+                ret.push(c);
+            }
+        }
+    }
+    ret
 }
