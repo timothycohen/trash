@@ -42,7 +42,11 @@ pub fn restore(source_path: &Path) {
     let trash_paths = match AbsoluteTrashPaths::find_by_source_path(source_path, &TrashDirPaths::new()) {
         Some(p) => p,
         None => {
-            eprintln!("{} File not found in trash.", Colour::Blue.paint("Info:"));
+            eprintln!(
+                "{} File not found in trash. {:?}",
+                Colour::Blue.paint("Info:"),
+                source_path
+            );
             std::process::exit(1);
         }
     };

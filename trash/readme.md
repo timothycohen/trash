@@ -84,6 +84,31 @@ DeletionDate=2022-06-12T01:01:10.803454+00:00
 FileSize=13.11 KB
 ```
 
+### Handles files/directories, single/multiple, absolute/relative paths
+
+```sh
+$ pwd
+~/dev/testing_trash
+$ tree
+.
+├── nest
+│   ├── really_nested
+│   │   └── deep.txt
+│   └── foz.txt
+└── abc.txt
+$ trash put abc.txt ~/dev/testing_trash/nest/really_nested nest/foz.txt
+$ tree
+.
+└── nest
+$ trash restore ~/dev/testing_trash/abc.txt ./nest/really_nested nest/foz.txt
+$ tree
+├── nest
+│   ├── really_nested
+│   │   └── deep.txt
+│   └── foz.txt
+└── abc.txt
+```
+
 ### `trash --help`
 
 ```sh
@@ -106,16 +131,6 @@ OPTIONS:
 ```
 
 ## Future plans
-
-### Multi file put support
-
-```sh
-$ ls
-abc.txt foo.txt foz.txt
-$ trash put foo.txt foz.txt
-$ ls
-abc.txt
-```
 
 ### Globular put
 
@@ -164,7 +179,7 @@ Option: _
 
 ```
 
-### Restore from Trash files folder
+### Restore from Trash files folder directly
 
 ```sh
 $ pwd
@@ -173,6 +188,20 @@ $ ls
 foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
 $ trash restore foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
 $ cd /private/tmp/testing/example
+$ ls
+foz.txt
+```
+
+### Handle symlinks
+
+```sh
+tmp@ -> private/tmp
+
+$ pwd
+/tmp/testing
+$ ls
+
+$ trash restore foz.txt
 $ ls
 foz.txt
 ```
