@@ -1,6 +1,7 @@
 use crate::GLOBAL;
 use ansi_term::Colour;
 use std::{
+    fs::ReadDir,
     io,
     path::{Path, PathBuf},
 };
@@ -111,6 +112,10 @@ impl TrashDirPaths {
         } else if let Err(e) = Self::create_default_dirs(&trash_path.trash_info_dir, &trash_path.trash_files_dir) {
             eprintln!("{} Unable to recreate default Trash. {}", Colour::Red.paint("Err:"), e);
         }
+    }
+
+    pub fn get_all_info_paths(&self) -> ReadDir {
+        std::fs::read_dir(&self.trash_info_dir).expect("Permissions and existence checked in new()")
     }
 }
 

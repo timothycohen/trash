@@ -1,3 +1,4 @@
+use ansi_term::Colour;
 use chrono::{DateTime, Utc};
 use humansize::{file_size_opts as options, FileSize};
 use std::path::{Path, PathBuf};
@@ -25,23 +26,31 @@ impl TrashInfo {
     }
 
     fn format_header() -> String {
-        "[Trash Info]".to_string()
+        format!("{}", Colour::Yellow.paint("[Trash Info]"))
     }
 
     fn format_file_name(&self) -> String {
-        format!("FileName={}", self.trash_file_name.display())
+        format!(
+            "{}{}",
+            Colour::Fixed(244).paint("FileName="),
+            self.trash_file_name.display()
+        )
     }
 
     pub fn format_source_path(source_path: &Path) -> String {
-        format!("Path={}", source_path.display())
+        format!("{}{}", Colour::Fixed(244).paint("Path="), source_path.display())
     }
 
     fn format_deletion_date(&self) -> String {
-        format!("DeletionDate={}", self.deletion_date.to_rfc3339())
+        format!(
+            "{}{}",
+            Colour::Fixed(244).paint("DeletionDate="),
+            self.deletion_date.to_rfc3339()
+        )
     }
 
     fn format_file_size(&self) -> String {
-        format!("FileSize={}", self.file_size)
+        format!("{}{}", Colour::Fixed(244).paint("FileSize="), self.file_size)
     }
 
     pub fn content(&self) -> String {
