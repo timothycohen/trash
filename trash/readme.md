@@ -83,6 +83,7 @@ $ trash info foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135.trashinfo
 [Trash Info]
 FileName=foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135
 Path=/private/tmp/testing/example/foo.txt
+IsDir=false
 DeletionDate=2022-06-12T01:01:09.012176+00:00
 FileSize=0 B
 ```
@@ -100,12 +101,14 @@ $ trash info
 [Trash Info]
 FileName=foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135
 Path=/private/tmp/testing/example/foo.txt
+IsDir=false
 DeletionDate=2022-06-12T01:01:09.012176+00:00
 FileSize=0 B
 
 [Trash Info]
 FileName=bar.txt.4cb89234-a921-428a-97b0-2edfc0326422
 Path=/private/tmp/testing/example/bar.txt
+IsDir=false
 DeletionDate=2022-06-12T01:01:10.803454+00:00
 FileSize=13.11 KB
 ```

@@ -7,6 +7,7 @@ pub struct TrashInfo {
     header: String,
     trash_file_name: PathBuf,
     source_path: PathBuf,
+    is_dir: bool,
     deletion_date: DateTime<Utc>,
     file_size: String,
 }
@@ -15,11 +16,13 @@ impl TrashInfo {
     pub fn new(source_path: PathBuf, trash_file_name: PathBuf) -> Self {
         let file_size = std::fs::metadata(&source_path).expect("TODO").len();
         let file_size = file_size.file_size(options::CONVENTIONAL).unwrap();
+        let is_dir = source_path.is_dir();
 
         TrashInfo {
             header: Self::format_header(),
             trash_file_name,
             source_path,
+            is_dir,
             deletion_date: std::time::SystemTime::now().into(),
             file_size,
         }
@@ -41,6 +44,10 @@ impl TrashInfo {
         format!("{}{}", Colour::Fixed(244).paint("Path="), source_path.display())
     }
 
+    pub fn format_is_dir(&self) -> String {
+        format!("{}{}", Colour::Fixed(244).paint("IsDir="), self.is_dir)
+    }
+
     fn format_deletion_date(&self) -> String {
         format!(
             "{}{}",
@@ -55,10 +62,11 @@ impl TrashInfo {
 
     pub fn content(&self) -> String {
         format!(
-            "{}\n{}\n{}\n{}\n{}",
+            "{}\n{}\n{}\n{}\n{}\n{}",
             self.header,
             self.format_file_name(),
             Self::format_source_path(&self.source_path),
+            self.format_is_dir(),
             self.format_deletion_date(),
             self.format_file_size()
         )
