@@ -2,6 +2,32 @@
 
 A Rust based CLI trash utility implementing [The FreeDesktop.org Trash specification](https://specifications.freedesktop.org/trash-spec/trashspec-1.0.html). Verbs based on [trash-cli](https://github.com/andreafrancia/trash-cli). It replaces the spartan rm alias with something more robust.
 
+# TODO UPDATE WITH GITHUB ACTIONS WHEN PUBLIC
+
+## Installation
+
+### Option 1: Download the binary in this repo at binary/trash
+
+### Option 2: Compile with cargo
+
+```sh
+$ git clone https://github.com/timothycohen/*****PLACEHOLDER*****
+$ cd *****PLACEHOLDER*****
+$ cargo build --release
+$ cp target/release/trash /path/to/your_bin_folder/in_PATH # example ~/.local/my_bin
+```
+
+### Alias
+
+I personally alias over rm (no silly mistakes :)) and the trash command from my_bin
+
+```sh
+# in .zsh_aliases or wherever you keep your aliases
+rm='~/.local/my_bin/trash put'
+rmc='~/.local/my_bin/trash'
+trash='mkdir -p ~/.local/share/Trash/files; cd ~/.local/share/Trash/files;'
+```
+
 ## Examples
 
 ### `trash put file` <br/> Moves file to the trash
@@ -132,22 +158,6 @@ OPTIONS:
 
 ## Future plans
 
-### Globular put
-
-```sh
-$ ls
-abc.txt foo.txt foz.txt
-$ trash put ./fo*
-Remove 2 files? y
-$ ls
-abc.txt
-
-$ touch rawr.rar rawrr.rar
-$ trash put -f ./rawr*
-$ ls
-abc.txt
-```
-
 ### Add selection for restoring conflicting paths
 
 ```sh
@@ -205,3 +215,7 @@ $ trash restore foz.txt
 $ ls
 foz.txt
 ```
+
+### Recursive Info
+
+### Globular info/restore (put already supported by virtue of shell expansion)
