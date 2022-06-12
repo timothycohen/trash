@@ -52,21 +52,21 @@ impl TrashNames {
     //         true => trash_file_name.file_stem().expect("not empty"),
     //         false => trash_file_name.file_name().expect("not empty"),
     //     };
-
+    //
     //     // check that it has at least a 36 char uuid and a `.` in the final spot
     //     println!("{:?}", trash_file_name);
     //     let len = trash_file_name.len();
     //     if len <= 37 {
     //         return Err(StripError::TooShort);
     //     }
-
+    //
     //     // TODO check that this doesn't affect 한글 or anything
     //     let trash_file_name = trash_file_name.to_string_lossy();
     //     let (mut file_basename, uuid) = trash_file_name.split_at(len - 36);
-
+    //
     //     file_basename = file_basename.strip_suffix('.').ok_or(StripError::InvalidDelimiter)?;
     //     let uuid = Uuid::parse_str(uuid).map_err(|_| StripError::InvalidUuid)?;
-
+    //
     //     Ok((PathBuf::from(file_basename), uuid))
     // }
 }

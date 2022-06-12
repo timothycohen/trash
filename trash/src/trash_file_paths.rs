@@ -13,6 +13,15 @@ pub struct AbsoluteTrashPaths {
     pub trash_file_path: PathBuf,
 }
 
+pub enum AbsoluteTrashPathsError {
+    WriteInfo(std::io::Error),
+    TrashFile(std::io::Error, AbsoluteTrashPaths),
+    RestoreFile(std::io::Error),
+    DeleteInfo(std::io::Error),
+}
+
+pub type AbsoluteTrashPathsResult = Result<(), AbsoluteTrashPathsError>;
+
 impl AbsoluteTrashPaths {
     pub fn new(trash_paths: TrashDirPaths, trash_names: TrashNames) -> Self {
         let mut trash_info_path = trash_paths.trash_info_dir;
@@ -90,7 +99,7 @@ impl AbsoluteTrashPaths {
         })
     }
 
-    pub fn delete_info_file(&self) {
+    pub fn try_delete_info_file(&self) -> AbsoluteTrashPathsResult {
         if GLOBAL.verbose() {
             println!(
                 "{} Removing info file at {}",
@@ -99,13 +108,14 @@ impl AbsoluteTrashPaths {
             );
         }
 
-        if let Err(e) = std::fs::remove_file(&self.trash_info_path) {
-            eprintln!("{} Could not remove info file. {:?}", Colour::Red.paint("Err:"), e);
-            std::process::exit(1)
-        }
+        std::fs::remove_file(&self.trash_info_path).map_err(AbsoluteTrashPathsError::DeleteInfo)
     }
 
-    pub fn move_to_trash(&self, source_path: &Path) {
+    pub fn delete_info_file(&self) {
+        Self::clean_and_bail_on_error(self.try_delete_info_file());
+    }
+
+    pub fn try_move_to_trash(self, source_path: &Path) -> AbsoluteTrashPathsResult {
         if GLOBAL.verbose() {
             println!(
                 "{} Moving trashed file to {}",
@@ -114,15 +124,15 @@ impl AbsoluteTrashPaths {
             );
         }
 
-        if let Err(e) = std::fs::rename(source_path, &self.trash_file_path) {
-            eprintln!("{} Could not move trashed file. {:?}", Colour::Red.paint("Err:"), e);
-
-            self.delete_info_file();
-            std::process::exit(1)
-        }
+        std::fs::rename(source_path, &self.trash_file_path).map_err(|e| AbsoluteTrashPathsError::TrashFile(e, self))
     }
 
-    pub fn write_info_file(&self, content: String) {
+    /// Consumes self to clean up if necessary
+    pub fn move_to_trash(self, source_path: &Path) {
+        Self::clean_and_bail_on_error(self.try_move_to_trash(source_path));
+    }
+
+    pub fn try_write_info_file(&self, content: String) -> AbsoluteTrashPathsResult {
         overwrite_guard(&self.trash_info_path);
 
         if GLOBAL.verbose() {
@@ -133,9 +143,51 @@ impl AbsoluteTrashPaths {
             );
         }
 
-        if let Err(e) = std::fs::write(&self.trash_info_path, content) {
-            eprintln!("{} Could not write info file. {:?}", Colour::Red.paint("Err:"), e);
-            std::process::exit(1)
+        std::fs::write(&self.trash_info_path, content).map_err(AbsoluteTrashPathsError::WriteInfo)
+    }
+
+    pub fn write_info_file(&self, content: String) {
+        Self::clean_and_bail_on_error(self.try_write_info_file(content));
+    }
+
+    pub fn clean_and_bail_on_error(maybe_error: AbsoluteTrashPathsResult) {
+        if let Err(trash_paths_error) = maybe_error {
+            match trash_paths_error {
+                AbsoluteTrashPathsError::DeleteInfo(e) => {
+                    eprintln!("{} Could not remove info file. {:?}", Colour::Red.paint("Err:"), e);
+                    std::process::exit(1)
+                }
+                AbsoluteTrashPathsError::WriteInfo(e) => {
+                    eprintln!("{} Could not write info file. {:?}", Colour::Red.paint("Err:"), e);
+                    std::process::exit(1)
+                }
+                AbsoluteTrashPathsError::TrashFile(e, trash_paths) => {
+                    eprintln!("{} Could not move trashed file. {:?}", Colour::Red.paint("Err:"), e);
+                    trash_paths.delete_info_file();
+                    std::process::exit(1)
+                }
+                AbsoluteTrashPathsError::RestoreFile(e) => {
+                    eprintln!("{} Could not restore trashed file. {:?}", Colour::Red.paint("Err:"), e);
+                    std::process::exit(1)
+                }
+            }
         }
+    }
+
+    pub fn try_restore_from_trash(&self, source_path: &Path) -> AbsoluteTrashPathsResult {
+        if GLOBAL.verbose() {
+            println!(
+                "{} Restoring trashed file to {}",
+                Colour::Blue.paint("Info:"),
+                source_path.display()
+            );
+        }
+
+        std::fs::rename(&self.trash_file_path, source_path).map_err(AbsoluteTrashPathsError::RestoreFile)
+    }
+
+    pub fn restore_from_trash(&self, source_path: &Path) {
+        Self::clean_and_bail_on_error(self.try_restore_from_trash(source_path));
+        self.delete_info_file();
     }
 }

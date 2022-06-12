@@ -51,12 +51,14 @@ impl TrashDirPaths {
         std::fs::create_dir_all(trash_files_path)?;
         Ok(())
     }
+
     fn remove_default_dirs(trash_info_path: &Path, trash_files_path: &Path) -> io::Result<()> {
         std::fs::remove_dir_all(trash_info_path)?;
         std::fs::remove_dir_all(trash_files_path)?;
         Ok(())
     }
 
+    /// Writes to stderr and bails on failure
     pub fn empty() {
         let trash_path = TrashDirPaths::default();
 
