@@ -1,14 +1,11 @@
 use crate::args::{Args, Method};
 use ansi_term::Colour;
-use std::{env, ffi::OsString, fs, path::PathBuf};
-use uuid::Uuid;
+use std::{env, fs, path::PathBuf};
 
 #[derive(Debug)]
 pub struct Config {
-    pub is_dir: bool,
     pub source_path: PathBuf,
-    pub file_basename: OsString,
-    pub uuid: Option<Uuid>,
+    pub file_basename: PathBuf,
 }
 
 impl From<Args> for Config {
@@ -19,6 +16,7 @@ impl From<Args> for Config {
 
         match args.method {
             Method::Empty => unreachable!(),
+            Method::Info => unreachable!(),
             Method::Put => {
                 let user_path = path_arg_guard(args.file);
                 let source_path = match fs::canonicalize(&user_path) {
@@ -30,8 +28,8 @@ impl From<Args> for Config {
                     }
                 };
 
-                let file_basename = match source_path.file_name() {
-                    Some(f) => f.to_owned(),
+                let file_basename: PathBuf = match source_path.file_name() {
+                    Some(f) => f.into(),
                     None => {
                         // the canonicalization should make this unreachable
                         eprintln!(
@@ -43,13 +41,9 @@ impl From<Args> for Config {
                     }
                 };
 
-                let is_dir = source_path.is_dir();
-
                 Config {
                     file_basename,
                     source_path,
-                    is_dir,
-                    uuid: Some(Uuid::new_v4()),
                 }
             }
 
@@ -68,8 +62,8 @@ impl From<Args> for Config {
 
                 let source_path: PathBuf = [pwd, PathBuf::from(user_path)].iter().collect();
 
-                let file_basename = match source_path.file_name() {
-                    Some(f) => f.to_owned(),
+                let file_basename: PathBuf = match source_path.file_name() {
+                    Some(f) => f.into(),
                     None => {
                         eprintln!(
                             "{} Unable to parse file path: {:?}",
@@ -80,20 +74,16 @@ impl From<Args> for Config {
                     }
                 };
 
-                let is_dir = source_path.is_dir();
-
                 Config {
                     file_basename,
                     source_path,
-                    is_dir,
-                    uuid: None,
                 }
             }
         }
     }
 }
 
-fn path_arg_guard(user_path: Option<String>) -> String {
+pub fn path_arg_guard(user_path: Option<String>) -> String {
     if user_path.is_none() {
         eprintln!("{} The following arguments are required:", Colour::Red.paint("error:"));
         eprintln!("    {}\n", Colour::Green.paint("[FILE]"));
