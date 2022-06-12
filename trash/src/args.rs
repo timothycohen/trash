@@ -6,6 +6,7 @@ pub enum Method {
     Put,
     Restore,
     Empty,
+    Info,
 }
 
 impl FromStr for Method {
@@ -18,21 +19,22 @@ impl FromStr for Method {
             "p" | "put" | "Put" => Ok(Put),
             "r" | "restore" | "Restore" => Ok(Restore),
             "e" | "empty" | "Empty" => Ok(Empty),
-            _ => Err("Valid methods are `put` `restore` `empty`"),
+            "i" | "info" => Ok(Info),
+            _ => Err("Valid methods are `empty` 'info' `put` `restore`"),
         }
     }
 }
 
-// todo. valid operations are put FILE; restore FILE; empty;
-// but the usage details make that a bit unclear. It's probably better to make separate commands rather than overloading the method with a sometimes required argument
+// todo the usage details make method + option unclear.
+// It's probably better to make separate commands rather than overloading the method with a sometimes required argument
 
 #[derive(Parser, Debug)]
 #[clap(version, about, long_about = None, author)]
 pub struct Args {
-    /// `p` | `put`     `r` | `restore`     `e` | `empty`
+    /// `e` | `empty`   `i` | 'info'   `p` | `put`   `r` | `restore`
     pub method: Method,
 
-    /// The target file or directory used with the `put` or `restore` methods
+    /// The target file or directory
     pub file: Option<String>,
 
     /// Explain all steps

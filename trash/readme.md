@@ -1,20 +1,64 @@
-### 🗑 Trash
+## 🗑 Trash
 
 A Rust based CLI trash utility implementing [The FreeDesktop.org Trash specification](https://specifications.freedesktop.org/trash-spec/trashspec-1.0.html). Verbs based on [trash-cli](https://github.com/andreafrancia/trash-cli). It replaces the spartan rm alias with something more robust.
 
-### Examples
+## Examples
 
-#### `trash put foo.bar -v`
+### `trash put file` <br/> Moves file to the trash
 
-Moves foo.bar to the trash and prints verbose logs.
+```sh
+$ ls
+bar.txt foo.txt
+$ trash put bar.txt
+$ trash put foo.txt -v
+Info: Canonicalizing file paths.
+Info: Writing info file to ~/.local/share/Trash/info/foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135.trashinfo
+Info: Moving trashed file to ~/.local/share/Trash/files/foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135
+$ ls
+$ _
+```
 
-#### `trash empty`
+### `trash empty` <br/> Empties the trash directory
 
-Empties the trash directory.
+```sh
+$ trash empty
+Warn: Permanently delete all 103 files at ~/.local/share/Trash/files? [y/n] y
+$ ls ~/.local/share/Trash/files
+$ _
+```
 
-#### `trash restore file -f`
+### `trash restore file` <br/> Restores a file
 
-Restores a file, potentially forcing an overwrite.
+```sh
+$ ls -lhAF
+-rw-r--r--   1 tco  staff    13K Jun 11 21:01 bar.txt
+-rw-r--r--   1 tco  staff    0B  Jun 11 21:01 foo.txt
+$ trash put foo.txt
+$ trash put bar.txt
+$ touch bar.txt
+$ trash restore foo.txt
+$ trash restore bar.txt
+Err: Will not overwrite file: "~/bar.txt"
+$ trash restore bar.txt -f # force
+$ ls -lhAF
+-rw-r--r--   1 tco  staff    13K Jun 11 21:01 bar.txt # trash copy has overwritten local copy
+-rw-r--r--   1 tco  staff    0B  Jun 11 21:01 foo.txt
+```
+
+### `trash info file` <br/> Show trash info from any folder
+
+```sh
+$ pwd
+~/.local/share/Trash/files
+$ ls
+foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135
+$ trash info foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135.trashinfo
+[Trash Info]
+FileName=foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135
+Path=/private/tmp/testing/example/foo.txt
+DeletionDate=2022-06-12T01:01:09.012176+00:00
+FileSize=0 B
+```
 
 ### `trash --help`
 
@@ -27,8 +71,8 @@ USAGE:
     trash [OPTIONS] <METHOD> [FILE]
 
 ARGS:
-    <METHOD>    `p` | `put`     `r` | `restore`     `e` | `empty`
-    <FILE>      The target file or directory used with the `put` or `restore` methods
+    <METHOD>    `e` | `empty`   `i` | 'info'   `p` | `put`   `r` | `restore`
+    <FILE>      The target file or directory
 
 OPTIONS:
     -f, --force      Force non-recoverable deletes/overwrites
@@ -37,9 +81,19 @@ OPTIONS:
     -V, --version    Print version information
 ```
 
-# Todo
+## Future plans
 
-### Add globular removes
+### Multi file put support
+
+```sh
+$ ls
+abc.txt foo.txt foz.txt
+$ trash put foo.txt foz.txt
+$ ls
+abc.txt
+```
+
+### Globular put
 
 ```sh
 $ ls
@@ -69,35 +123,21 @@ foo.txt.c4037062-7d6b-47e9-a48b-fd9efb757d6c
 $ trash restore foo.txt
 
 ──────────────┼───────────────────────────────────────────────────────────────
-Option 1:     | foo.txt.5356c39d-94de-498e-96c0-0d462df92a34
-Deletion Date | "2022-06-11T02:31:31.200846+00:00"
-File Size     | 60B
+Option 1:     | foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135.trashinfo
+Path:         | private/tmp/testing/example/foo.txt
+Deletion Date | 2022-06-12T01:01:09.012176+00:00
+File Size     | 0 B
 ──────────────┼───────────────────────────────────────────────────────────────
 ──────────────┼───────────────────────────────────────────────────────────────
 Option 2:     | foo.txt.c4037062-7d6b-47e9-a48b-fd9efb757d6c
-Deletion Date | "2022-06-11T02:31:35.722779+00:00"
-File Size     | 60B
+Path:         | private/tmp/testing/example/foo.txt
+Deletion Date | 2022-06-11T02:31:35.722779+00:00
+File Size     | 6.42 KB
 ──────────────┼───────────────────────────────────────────────────────────────
 
 Which would you like to restore? (See at ~/.local/share/Trash/files)
 Option: _
 
-```
-
-### Show trash info from Trash files folder
-
-```sh
-$ pwd
-~/.local/share/Trash/files
-$ ls
-foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
-$ trash info foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
-───────┼───────────────────────────────────────────────────────────────
-       │ File: foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7.trashinfo
-   1   │ [Trash Info]
-   2   │ Path=/private/tmp/testing/example/foz.txt
-   3   │ DeletionDate="2022-06-11T02:31:18.961346+00:00"
-───────┼───────────────────────────────────────────────────────────────
 ```
 
 ### Restore from Trash files folder
@@ -112,3 +152,5 @@ $ cd /private/tmp/testing/example
 $ ls
 foz.txt
 ```
+
+### Show all trash files
