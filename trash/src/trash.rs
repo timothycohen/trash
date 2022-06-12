@@ -25,26 +25,14 @@ pub fn restore(source_path: &Path) {
     overwrite_guard(source_path);
 
     let trash_paths = match AbsoluteTrashPaths::find_by_source_path(source_path, &TrashDirPaths::new()) {
-        Some(f) => f,
+        Some(p) => p,
         None => {
             eprintln!("{} File not found in trash.", Colour::Blue.paint("Info:"));
             std::process::exit(1);
         }
     };
 
-    if GLOBAL.verbose() {
-        println!(
-            "{} Restoring trashed file to {}",
-            Colour::Blue.paint("Info:"),
-            source_path.display()
-        );
-    }
-
-    if let Err(e) = std::fs::rename(&trash_paths.trash_file_path, source_path) {
-        eprintln!("{} Could not restore trashed file. {:?}", Colour::Red.paint("Err:"), e);
-    } else {
-        trash_paths.delete_info_file();
-    }
+    trash_paths.restore_from_trash(source_path);
 }
 
 pub fn empty() {
