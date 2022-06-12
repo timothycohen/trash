@@ -34,8 +34,8 @@ pub struct Args {
     /// `e` | `empty`   `i` | 'info'   `p` | `put`   `r` | `restore`
     pub method: Method,
 
-    /// The target file or directory
-    pub file: Option<String>,
+    /// The target files or directories
+    pub files: Vec<String>,
 
     /// Explain all steps
     #[clap(short, long)]

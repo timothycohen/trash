@@ -1,3 +1,4 @@
+use ansi_term::Colour;
 use args::{Args, Method::*};
 use clap::Parser;
 use config::Config;
@@ -29,12 +30,37 @@ fn main() {
     GLOBAL.set_force(args.force);
 
     match args.method {
-        Put => put(Config::from(args)),
-        Restore => restore(&Config::from(args).source_path),
+        Put => {
+            path_arg_guard(&args.files);
+            for user_path in args.files {
+                put(Config::new(&args.method, user_path))
+            }
+        }
+        Restore => {
+            // todo. if no path, do an interactive restoration by showing the trash contents
+            path_arg_guard(&args.files);
+            for user_path in args.files {
+                restore(&Config::new(&args.method, user_path).source_path)
+            }
+        }
         Empty => empty(),
-        Info => match args.file {
-            Some(f) => info(f),
-            None => info_all(),
+        Info => match args.files.len() {
+            0 => info_all(),
+            _ => {
+                for user_path in args.files {
+                    println!();
+                    info(user_path)
+                }
+            }
         },
     };
+}
+
+pub fn path_arg_guard(user_path: &Vec<String>) {
+    if user_path.is_empty() {
+        eprintln!("{} The following arguments are required:", Colour::Red.paint("error:"));
+        eprintln!("    {}\n", Colour::Green.paint("[FILE]"));
+        eprintln!("For more information try {}", Colour::Green.paint("--help"));
+        std::process::exit(1)
+    }
 }

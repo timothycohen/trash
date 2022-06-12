@@ -1,4 +1,5 @@
-use crate::args::{Args, Method};
+use crate::args::Method;
+use crate::GLOBAL;
 use ansi_term::Colour;
 use std::{
     env, fs,
@@ -11,22 +12,25 @@ pub struct Config {
     pub file_basename: PathBuf,
 }
 
-impl From<Args> for Config {
-    fn from(args: Args) -> Self {
-        if args.verbose {
+impl Config {
+    pub fn new(method: &Method, user_path: String) -> Self {
+        if GLOBAL.verbose() {
             println!("{} Canonicalizing file paths.", Colour::Blue.paint("Info:"));
         }
 
-        match args.method {
+        match method {
             Method::Empty => unreachable!(),
             Method::Info => unreachable!(),
             Method::Put => {
-                let user_path = path_arg_guard(args.file);
                 let source_path = match fs::canonicalize(&user_path) {
                     Ok(p) => p,
                     Err(e) => {
                         eprintln!("{} Unable to canonicalize file path: {}", Colour::Red.paint("Err:"), e);
-                        eprintln!("{} Problem path: {}", Colour::Yellow.paint("Hint:"), &user_path);
+                        eprintln!(
+                            "{} Does this problem path exist? {}",
+                            Colour::Yellow.paint("Hint:"),
+                            &user_path
+                        );
                         std::process::exit(1)
                     }
                 };
@@ -36,7 +40,7 @@ impl From<Args> for Config {
                     None => {
                         // the canonicalization should make this unreachable
                         eprintln!(
-                            "{} Unable to parse file source_path: {:?}",
+                            "{} Unable to parse file source path: {:?}",
                             Colour::Red.paint("Err:"),
                             source_path
                         );
@@ -51,9 +55,6 @@ impl From<Args> for Config {
             }
 
             Method::Restore => {
-                // todo. if no path, do an interactive restoration by showing the trash contents
-                let user_path = path_arg_guard(args.file);
-
                 let pwd = match env::current_dir() {
                     Ok(d) => d,
                     Err(e) => {
@@ -84,16 +85,6 @@ impl From<Args> for Config {
             }
         }
     }
-}
-
-pub fn path_arg_guard(user_path: Option<String>) -> String {
-    if user_path.is_none() {
-        eprintln!("{} The following arguments are required:", Colour::Red.paint("error:"));
-        eprintln!("    {}\n", Colour::Green.paint("[FILE]"));
-        eprintln!("For more information try {}", Colour::Green.paint("--help"));
-        std::process::exit(1)
-    }
-    user_path.unwrap()
 }
 
 pub fn normalize_path(path: &Path) -> PathBuf {
