@@ -21,6 +21,21 @@ pub fn info(user_path: String) {
     TrashInfo::read_to_std(&trash_paths.trash_info_path);
 }
 
+pub fn info_all() {
+    let trash_dir_paths = TrashDirPaths::new();
+    for trash_info_path in trash_dir_paths.get_all_info_paths() {
+        match trash_info_path {
+            Ok(p) => {
+                println!();
+                TrashInfo::read_to_std(&p.path())
+            }
+            Err(e) => {
+                eprintln!("{} Unable to read file: {}", Colour::Red.paint("Error:"), e);
+            }
+        };
+    }
+}
+
 pub fn restore(source_path: &Path) {
     overwrite_guard(source_path);
 

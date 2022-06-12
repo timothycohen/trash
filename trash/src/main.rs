@@ -2,7 +2,7 @@ use args::{Args, Method::*};
 use clap::Parser;
 use config::Config;
 use global::GLOBAL;
-use trash::{empty, info, put, restore};
+use trash::{empty, info, info_all, put, restore};
 
 mod args;
 mod config;
@@ -32,6 +32,9 @@ fn main() {
         Put => put(Config::from(args)),
         Restore => restore(&Config::from(args).source_path),
         Empty => empty(),
-        Info => info(config::path_arg_guard(args.file)),
+        Info => match args.file {
+            Some(f) => info(f),
+            None => info_all(),
+        },
     };
 }
