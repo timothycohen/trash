@@ -4,11 +4,11 @@ use humansize::{file_size_opts as options, FileSize};
 use std::path::{Path, PathBuf};
 
 pub struct TrashInfo {
-    trash_file_name: PathBuf,
-    source_path: PathBuf,
-    is_dir: bool,
-    deletion_date: DateTime<Utc>,
-    file_size: String,
+    pub trash_file_name: PathBuf,
+    pub source_path: PathBuf,
+    pub is_dir: bool,
+    pub deletion_date: DateTime<Utc>,
+    pub file_size: String,
 }
 
 impl TrashInfo {
