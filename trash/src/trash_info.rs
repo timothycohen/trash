@@ -86,7 +86,7 @@ impl TrashInfo {
                 eprintln!("{}", e);
                 return;
             }
-            println!("{}", trash_info.unwrap().color_content(true));
+            println!("\n{}", trash_info.unwrap().color_content(true));
         }
     }
 

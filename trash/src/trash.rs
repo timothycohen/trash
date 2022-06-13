@@ -14,16 +14,40 @@ pub fn put(config: Config) {
     trash_paths.move_to_trash(&config.source_path);
 }
 
-pub fn info(user_path: String) {
+/// Print .trashinfo data if it exists
+pub fn info(user_path: &str) {
     let trash_names = TrashNames::from_trash_file_name(PathBuf::from(user_path));
     let trash_paths = AbsoluteTrashPaths::new(TrashDirPaths::new(), trash_names);
     trash_paths.guard_exists();
     TrashInfo::read_to_std(&trash_paths.trash_info_path);
 }
 
+/// Print all .trashinfo data with a matching file name
+pub fn info_wild_card(user_path: &str) {
+    let trash_names = TrashNames::from_trash_file_name(PathBuf::from(user_path));
+    let mut partial_name = AbsoluteTrashPaths::new(TrashDirPaths::new(), trash_names).trash_info_path;
+    partial_name.set_extension("");
+    let user_path = partial_name.to_string_lossy().into_owned();
+
+    for trash_info_path in TrashDirPaths::new().get_all_info_paths() {
+        match trash_info_path {
+            Ok(p) => {
+                let p = p.path();
+                let info_path = p.to_string_lossy();
+                if info_path.contains(&user_path) {
+                    TrashInfo::read_to_std(&p)
+                }
+            }
+            Err(e) => {
+                eprintln!("{} Unable to read file: {}", Colour::Red.paint("Error:"), e);
+            }
+        };
+    }
+}
+
+/// Print all .trashinfo data
 pub fn info_all() {
-    let trash_dir_paths = TrashDirPaths::new();
-    for trash_info_path in trash_dir_paths.get_all_info_paths() {
+    for trash_info_path in TrashDirPaths::new().get_all_info_paths() {
         match trash_info_path {
             Ok(p) => {
                 println!();

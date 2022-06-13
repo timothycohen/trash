@@ -3,7 +3,7 @@ use args::{Args, Method::*};
 use clap::Parser;
 use config::Config;
 use global::GLOBAL;
-use trash::{empty, info, info_all, put, restore};
+use trash::{empty, info, info_all, info_wild_card, put, restore};
 
 mod args;
 mod config;
@@ -48,8 +48,11 @@ fn main() {
             0 => info_all(),
             _ => {
                 for user_path in args.files {
-                    println!();
-                    info(user_path)
+                    if args.all {
+                        info_wild_card(&user_path);
+                    } else {
+                        info(&user_path)
+                    }
                 }
             }
         },
