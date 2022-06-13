@@ -37,8 +37,6 @@ pub fn info_all() {
 }
 
 pub fn restore(source_path: &Path) {
-    overwrite_guard(source_path);
-
     let trash_paths = match AbsoluteTrashPaths::find_by_source_path(source_path, &TrashDirPaths::new()) {
         Some(p) => p,
         None => {
@@ -51,7 +49,21 @@ pub fn restore(source_path: &Path) {
         }
     };
 
-    trash_paths.restore_from_trash(source_path);
+    // Use the .trashinfo source_path instead of the user's to allow for partial matches
+    let trash_info = match TrashInfo::from_file(&trash_paths.trash_info_path) {
+        Ok(i) => i,
+        Err(e) => {
+            eprintln!(
+                "{} .trashinfo file has been corrupted. {:?}",
+                Colour::Blue.paint("Info:"),
+                e
+            );
+            std::process::exit(1);
+        }
+    };
+
+    overwrite_guard(&trash_info.source_path);
+    trash_paths.restore_from_trash(&trash_info.source_path);
 }
 
 pub fn empty() {
