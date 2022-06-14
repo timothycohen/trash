@@ -83,7 +83,12 @@ impl TrashInfo {
         if trash_info_path.is_file() {
             let trash_info = TrashInfo::from_file(trash_info_path);
             if let Err(e) = trash_info {
-                eprintln!("{}", e);
+                eprintln!(
+                    "{} {:?} has been corrupted. {:?}",
+                    Colour::Yellow.paint("Warning:"),
+                    trash_info_path,
+                    e
+                );
                 return;
             }
             println!("\n{}", trash_info.unwrap().color_content(true));
@@ -93,23 +98,25 @@ impl TrashInfo {
     pub fn from_file(source_path: &Path) -> Result<TrashInfo, Box<dyn std::error::Error + Send + Sync + 'static>> {
         let file = std::fs::read_to_string(&source_path)?;
         let mut lines = file.lines();
-        if lines.next().is_none() {
-            Err("missing header")?
-        }
+
+        lines
+            .next()
+            .ok_or("missing header")?
+            .trim_start_exact(TrashInfo::HEADER)?;
         let trash_file_name: PathBuf = lines
             .next()
             .ok_or("missing trash_file_name")?
-            .trim_start_matches(&TrashInfo::FILENAME)
+            .trim_start_exact(TrashInfo::FILENAME)?
             .into();
         let source_path: PathBuf = lines
             .next()
             .ok_or("missing source_path")?
-            .trim_start_matches(&TrashInfo::PATH)
+            .trim_start_exact(TrashInfo::PATH)?
             .into();
         let is_dir: bool = match lines
             .next()
             .ok_or("missing is_dir")?
-            .trim_start_matches(&TrashInfo::ISDIR)
+            .trim_start_exact(TrashInfo::ISDIR)?
         {
             "true" => true,
             "false" => false,
@@ -119,11 +126,12 @@ impl TrashInfo {
             lines
                 .next()
                 .ok_or("missing deletion date")?
-                .trim_start_matches(&TrashInfo::DELETIONDATE),
-        )?
+                .trim_start_exact(TrashInfo::DELETIONDATE)?,
+        )
+        .map_err(|_| "Cannot parse date")?
         .with_timezone(&chrono::Utc);
 
-        let file_size = lines.next().unwrap().trim_start_matches(&TrashInfo::FILESIZE).into();
+        let file_size = lines.next().unwrap().trim_start_exact(TrashInfo::FILESIZE)?.into();
 
         Ok(TrashInfo {
             trash_file_name,
@@ -132,5 +140,31 @@ impl TrashInfo {
             deletion_date,
             file_size,
         })
+    }
+}
+
+trait Trimmer {
+    fn trim_start_exact<'a>(
+        &'a self,
+        prefix: &str,
+    ) -> Result<&'a str, Box<dyn std::error::Error + Send + Sync + 'static>>;
+}
+
+impl Trimmer for str {
+    fn trim_start_exact<'a>(
+        &'a self,
+        prefix: &str,
+    ) -> Result<&'a str, Box<dyn std::error::Error + Send + Sync + 'static>> {
+        let (start, data) = self.split_once(prefix).ok_or(format!(
+            "Incorrect format. Expected prefix `{}` found `{self}`.",
+            prefix
+        ))?;
+        if !start.is_empty() {
+            Err(format!(
+                "Incorrect format. Expected prefix `{}` found `{}{}`",
+                prefix, start, prefix
+            ))?;
+        }
+        Ok(data)
     }
 }
