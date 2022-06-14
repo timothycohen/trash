@@ -53,7 +53,7 @@ $ ls ~/.local/share/Trash/files
 $ _
 ```
 
-### `trash restore file` <br/> Restores a file
+### `trash restore file` <br/> Restores a file by path/name
 
 ```sh
 $ ls -lhAF
@@ -78,7 +78,7 @@ $ pwd
 ~/.local/share/Trash/files
 $ ls
 foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135
-$ trash info foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135.trashinfo
+$ trash info -a fo
 
 [Trash Info]
 FileName=foo.txt.e6ba2602-6886-4ee3-851a-a27b3a64c135
@@ -153,6 +153,7 @@ ARGS:
     <FILE>      The target file or directory
 
 OPTIONS:
+    -a, --all        All (wildcard `*` like matches)
     -f, --force      Force non-recoverable deletes/overwrites
     -h, --help       Print help information
     -v, --verbose    Explain all steps
@@ -221,4 +222,4 @@ foz.txt
 
 ### Recursive Info
 
-### Globular info/restore (put already supported by virtue of shell expansion)
+### Globular restore (info done and put supported by shell expansion)

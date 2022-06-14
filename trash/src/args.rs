@@ -44,4 +44,8 @@ pub struct Args {
     /// Force non-recoverable deletes/overwrites
     #[clap(short, long)]
     pub force: bool,
+
+    /// All (wildcard `*` like matches)
+    #[clap(short, long)]
+    pub all: bool,
 }
