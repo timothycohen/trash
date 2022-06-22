@@ -79,7 +79,7 @@ pub fn restore(source_path: &Path) {
         Err(e) => {
             eprintln!(
                 "{} .trashinfo file has been corrupted. {:?}",
-                Colour::Blue.paint("Info:"),
+                Colour::Yellow.paint("Warning:"),
                 e
             );
             std::process::exit(1);
