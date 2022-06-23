@@ -60,20 +60,35 @@ pub fn info_all() {
     }
 }
 
-pub fn restore(source_path: &Path) {
-    let trash_paths = match AbsoluteTrashPaths::find_by_source_path(source_path, &TrashDirPaths::new()) {
-        Some(p) => p,
-        None => {
-            eprintln!(
-                "{} File not found in trash. {:?}",
-                Colour::Blue.paint("Info:"),
-                source_path
-            );
-            std::process::exit(1);
+/// Restore by Trash/files/base_name || Trash/info_base_name.trashinfo || source_path
+pub fn restore(path: &Path) {
+    let trash_dirs = TrashDirPaths::new();
+
+    let trash_paths = if path.starts_with(&trash_dirs.trash_files_dir) || path.starts_with(&trash_dirs.trash_info_dir) {
+        // assume the path is in the info path, and change it if it's actually in the files dir
+        let mut trash_info_path = path.to_owned();
+        if path.starts_with(&trash_dirs.trash_files_dir) {
+            let trash_info_name = TrashNames::from_trash_file_name(path.to_path_buf()).trash_info_name;
+            trash_info_path = trash_dirs.trash_info_dir;
+            trash_info_path.push(trash_info_name);
+        }
+
+        let trash_paths = AbsoluteTrashPaths::new(
+            TrashDirPaths::new(),
+            TrashNames::from_trash_info_name(trash_info_path.file_name().expect("not empty").into()),
+        );
+        trash_paths.guard_exists();
+        trash_paths
+    } else {
+        match AbsoluteTrashPaths::find_by_source_path(path, &trash_dirs) {
+            Some(p) => p,
+            None => {
+                eprintln!("{} File not found in trash. {:?}", Colour::Blue.paint("Info:"), path);
+                std::process::exit(1);
+            }
         }
     };
 
-    // Use the .trashinfo source_path instead of the user's to allow for partial matches
     let trash_info = match TrashInfo::from_file(&trash_paths.trash_info_path) {
         Ok(i) => i,
         Err(e) => {

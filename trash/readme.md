@@ -71,6 +71,19 @@ $ ls -lhAF
 -rw-r--r--   1 tco  staff    0B  Jun 11 21:01 foo.txt
 ```
 
+### Restore from Trash files folder directly
+
+```sh
+$ pwd
+~/.local/share/Trash/files
+$ ls
+foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
+$ trash restore foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
+$ cd /private/tmp/testing/example
+$ ls
+foz.txt
+```
+
 ### `trash info file` <br/> Show trash info from any folder
 
 ```sh
@@ -191,19 +204,6 @@ File Size     | 6.42 KB
 Which would you like to restore? (See at ~/.local/share/Trash/files)
 Option: _
 
-```
-
-### Restore from Trash files folder directly
-
-```sh
-$ pwd
-~/.local/share/Trash/files
-$ ls
-foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
-$ trash restore foz.txt.c16b01c0-116b-4fc5-ab92-8d1a15953ff7
-$ cd /private/tmp/testing/example
-$ ls
-foz.txt
 ```
 
 ### Handle symlinks
