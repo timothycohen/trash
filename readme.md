@@ -1,18 +1,14 @@
 ## 🗑 Trash
 
-A Rust based CLI trash utility implementing [The FreeDesktop.org Trash specification](https://specifications.freedesktop.org/trash-spec/trashspec-1.0.html). Verbs based on [trash-cli](https://github.com/andreafrancia/trash-cli). It replaces the spartan rm alias with something more robust.
-
-# TODO UPDATE WITH GITHUB ACTIONS WHEN PUBLIC
+A Rust based CLI trash utility implementing [The FreeDesktop.org Trash specification](https://specifications.freedesktop.org/trash-spec/trashspec-1.0.html). Verbs originally based on [trash-cli](https://github.com/andreafrancia/trash-cli). It replaces the spartan rm alias with something more robust.
 
 ## Installation
 
-### Option 1: Download the binary in this repo at binary/trash
-
-### Option 2: Compile with cargo
+### Compile with cargo
 
 ```sh
-$ git clone https://github.com/timothycohen/*****PLACEHOLDER*****
-$ cd *****PLACEHOLDER*****
+$ git clone https://github.com/timothycohen/trash
+$ cd trash
 $ cargo build --release
 $ cp target/release/trash /path/to/your_bin_folder/in_PATH # example ~/.local/my_bin
 ```
@@ -23,9 +19,9 @@ I personally alias over rm (no silly mistakes :)) and the trash command from my_
 
 ```sh
 # in .zsh_aliases or wherever you keep your aliases
-rm='~/.local/my_bin/trash put'
-rmc='~/.local/my_bin/trash'
-trash='mkdir -p ~/.local/share/Trash/files; cd ~/.local/share/Trash/files;'
+alias rm='~/.local/my_bin/trash put'
+alias rmc='~/.local/my_bin/trash'
+alias trash='mkdir -p ~/.local/share/Trash/files; cd ~/.local/share/Trash/files;'
 ```
 
 ## Examples
@@ -206,7 +202,7 @@ Option: _
 
 ```
 
-### Handle symlinks
+### Handle symlinks on all systems
 
 ```sh
 tmp@ -> private/tmp
@@ -220,6 +216,18 @@ $ ls
 foz.txt
 ```
 
+### Trash Info for files deleted from pwd only
+
 ### Recursive Info
 
-### Globular restore (info done and put supported by shell expansion)
+### Restore from nested deleted folder in trash directory
+
+### \*Wildcard
+
+- [x] info
+- [ ] restore (supported by shell expansion in the Trash dirs)
+- [ ] put (supported by shell expansion)
+
+### Add GitHub Actions for releases
+
+### Testing for different platforms (currently used on M1 macOS)
