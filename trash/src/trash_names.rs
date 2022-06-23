@@ -25,12 +25,12 @@ impl TrashNames {
         Self::from_trash_file_name(PathBuf::from(trash_file_name))
     }
 
-    // pub fn from_trash_info_name(trash_info_name: PathBuf) -> TrashNames {
-    //     TrashNames {
-    //         trash_file_name: PathBuf::from(trash_info_name.file_stem().expect("not empty")),
-    //         trash_info_name: PathBuf::from(trash_info_name.file_name().expect("not empty")),
-    //     }
-    // }
+    pub fn from_trash_info_name(trash_info_name: PathBuf) -> TrashNames {
+        TrashNames {
+            trash_file_name: PathBuf::from(trash_info_name.file_stem().expect("not empty")),
+            trash_info_name: PathBuf::from(trash_info_name.file_name().expect("not empty")),
+        }
+    }
 
     pub fn from_trash_file_name(trash_file_name: PathBuf) -> TrashNames {
         let trash_file_name = PathBuf::from(trash_file_name.file_name().expect("not empty"));
@@ -102,20 +102,20 @@ fn from_trash_file() {
     );
 }
 
-// #[test]
-// fn from_trash_info() {
-//     let trash_names = TrashNames::from_trash_info_name(PathBuf::from(
-//         "~/dev/c.txt.23f9089d-62b2-4102-80ae-de95ee4d66d0.trashinfo",
-//     ));
-//     assert_eq!(
-//         PathBuf::from("c.txt.23f9089d-62b2-4102-80ae-de95ee4d66d0"),
-//         trash_names.trash_file_name
-//     );
-//     assert_eq!(
-//         PathBuf::from("c.txt.23f9089d-62b2-4102-80ae-de95ee4d66d0.trashinfo"),
-//         trash_names.trash_info_name
-//     );
-// }
+#[test]
+fn from_trash_info() {
+    let trash_names = TrashNames::from_trash_info_name(PathBuf::from(
+        "~/dev/c.txt.23f9089d-62b2-4102-80ae-de95ee4d66d0.trashinfo",
+    ));
+    assert_eq!(
+        PathBuf::from("c.txt.23f9089d-62b2-4102-80ae-de95ee4d66d0"),
+        trash_names.trash_file_name
+    );
+    assert_eq!(
+        PathBuf::from("c.txt.23f9089d-62b2-4102-80ae-de95ee4d66d0.trashinfo"),
+        trash_names.trash_info_name
+    );
+}
 
 // #[test]
 // fn strip_uuid() {
