@@ -1,6 +1,6 @@
-use ansi_term::Colour;
 use args::{Args, Method::*};
 use clap::Parser;
+use colored::Colorize;
 use config::Config;
 use global::GLOBAL;
 use trash::{empty, info, info_all, info_wild_card, put, restore};
@@ -61,9 +61,9 @@ fn main() {
 
 pub fn path_arg_guard(user_path: &[String]) {
     if user_path.is_empty() {
-        eprintln!("{} The following arguments are required:", Colour::Red.paint("error:"));
-        eprintln!("    {}\n", Colour::Green.paint("[FILE]"));
-        eprintln!("For more information try {}", Colour::Green.paint("--help"));
+        eprintln!("{} The following arguments are required:", "error:".red());
+        eprintln!("    {}\n", "[FILE]".green());
+        eprintln!("For more information try {}", "--help".green());
         std::process::exit(1)
     }
 }

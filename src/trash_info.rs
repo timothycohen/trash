@@ -1,5 +1,5 @@
-use ansi_term::Colour;
 use chrono::{DateTime, Utc};
+use colored::Colorize;
 use humansize::{file_size_opts as options, FileSize};
 use std::path::{Path, PathBuf};
 
@@ -41,7 +41,7 @@ impl TrashInfo {
         format!("{}{}", TrashInfo::PATH, source_path.display())
     }
     fn color_format_source_path(source_path: &Path) -> String {
-        format!("{}{}", Colour::Fixed(244).paint(TrashInfo::PATH), source_path.display())
+        format!("{}{}", TrashInfo::PATH, source_path.display())
     }
 
     fn color_content(&self, color: bool) -> String {
@@ -49,15 +49,15 @@ impl TrashInfo {
             true => {
                 format!(
                     "{}\n{}{}\n{}\n{}{}\n{}{}\n{}{}",
-                    Colour::Yellow.paint(TrashInfo::HEADER),
-                    Colour::Fixed(244).paint(TrashInfo::FILENAME),
+                    TrashInfo::HEADER.yellow(),
+                    TrashInfo::FILENAME,
                     self.trash_file_name.display(),
                     Self::color_format_source_path(&self.source_path),
-                    Colour::Fixed(244).paint(TrashInfo::ISDIR),
+                    TrashInfo::ISDIR,
                     self.is_dir,
-                    Colour::Fixed(244).paint(TrashInfo::DELETIONDATE),
+                    TrashInfo::DELETIONDATE,
                     self.deletion_date.to_rfc3339(),
-                    Colour::Fixed(244).paint(TrashInfo::FILESIZE),
+                    TrashInfo::FILESIZE,
                     self.file_size,
                 )
             }
@@ -85,7 +85,7 @@ impl TrashInfo {
             if let Err(e) = trash_info {
                 eprintln!(
                     "{} {:?} has been corrupted. {:?}",
-                    Colour::Yellow.paint("Warning:"),
+                    "Warning:".yellow(),
                     trash_info_path,
                     e
                 );

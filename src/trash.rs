@@ -2,7 +2,7 @@ use crate::{
     config::Config, trash_dir_paths::TrashDirPaths, trash_file_paths::AbsoluteTrashPaths, trash_info::TrashInfo,
     trash_names::TrashNames, GLOBAL,
 };
-use ansi_term::Colour;
+use colored::Colorize;
 use std::path::{Path, PathBuf};
 
 pub fn put(config: Config) {
@@ -39,7 +39,7 @@ pub fn info_wild_card(user_path: &str) {
                 }
             }
             Err(e) => {
-                eprintln!("{} Unable to read file: {}", Colour::Red.paint("Error:"), e);
+                eprintln!("{} Unable to read file: {}", "error:".red(), e);
             }
         };
     }
@@ -54,7 +54,7 @@ pub fn info_all() {
                 TrashInfo::read_to_std(&p.path())
             }
             Err(e) => {
-                eprintln!("{} Unable to read file: {}", Colour::Red.paint("Error:"), e);
+                eprintln!("{} Unable to read file: {}", "error:".red(), e);
             }
         };
     }
@@ -83,7 +83,7 @@ pub fn restore(path: &Path) {
         match AbsoluteTrashPaths::find_by_source_path(path, &trash_dirs) {
             Some(p) => p,
             None => {
-                eprintln!("{} File not found in trash. {:?}", Colour::Blue.paint("Info:"), path);
+                eprintln!("{} File not found in trash. {:?}", "Info:".blue(), path);
                 std::process::exit(1);
             }
         }
@@ -92,11 +92,7 @@ pub fn restore(path: &Path) {
     let trash_info = match TrashInfo::from_file(&trash_paths.trash_info_path) {
         Ok(i) => i,
         Err(e) => {
-            eprintln!(
-                "{} .trashinfo file has been corrupted. {:?}",
-                Colour::Yellow.paint("Warning:"),
-                e
-            );
+            eprintln!("{} .trashinfo file has been corrupted. {:?}", "Warning:".yellow(), e);
             std::process::exit(1);
         }
     };
@@ -111,7 +107,7 @@ pub fn empty() {
 
 pub fn overwrite_guard(path: &Path) {
     if path.exists() && !GLOBAL.force() {
-        eprintln!("{} Will not overwrite file: {:?}", Colour::Red.paint("Err:"), path);
+        eprintln!("{} Will not overwrite file: {:?}", "Err:".red(), path);
         std::process::exit(1)
     }
 }

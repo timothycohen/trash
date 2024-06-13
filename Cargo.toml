@@ -6,11 +6,11 @@ authors = ["Tim Cohen <contact@timcohen.dev>"]
 description = "A cli trash utility."
 
 [dependencies]
-ansi_term = "0.12.1"
 chrono = "0.4.19"
-clap = {version = "3.1.18", features = ["derive"]}
+clap = { version = "3.1.18", features = ["derive"] }
+colored = "2.1.0"
 dialoguer = "0.10.1"
 home = "0.5.3"
 humansize = "1.1.1"
 lazy_static = "1.4.0"
-uuid = {version = "1.1.1", features = ["v4"] }
+uuid = { version = "1.1.1", features = ["v4"] }

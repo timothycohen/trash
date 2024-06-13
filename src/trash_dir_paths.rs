@@ -1,5 +1,5 @@
 use crate::GLOBAL;
-use ansi_term::Colour;
+use colored::Colorize;
 use std::{
     fs::ReadDir,
     io,
@@ -17,7 +17,7 @@ impl TrashDirPaths {
     pub fn new() -> TrashDirPaths {
         let home = match home::home_dir() {
             None => {
-                eprintln!("{} Unable to get home directory.", Colour::Red.paint("Err:"));
+                eprintln!("{} Unable to get home directory.", "Err:".red());
                 std::process::exit(1);
             }
             Some(h) => h,
@@ -29,14 +29,10 @@ impl TrashDirPaths {
 
         if !trash_info_dir.exists() | !trash_files_dir.exists() {
             if GLOBAL.verbose() {
-                println!(
-                    "{} Couldn't find Trash. Creating at {:?}",
-                    Colour::Blue.paint("Info:"),
-                    trash_path
-                );
+                println!("{} Couldn't find Trash. Creating at {:?}", "Info:".blue(), trash_path);
             }
             if let Err(e) = Self::create_default_dirs(&trash_info_dir, &trash_files_dir) {
-                eprintln!("{} Unable to create Trash. {}", Colour::Yellow.paint("Hint:"), e);
+                eprintln!("{} Unable to create Trash. {}", "Hint:".yellow(), e);
                 std::process::exit(1);
             };
         }
@@ -73,11 +69,7 @@ impl TrashDirPaths {
         };
 
         if number_of_files == 0 && !GLOBAL.force() {
-            println!(
-                "{} {} is empty",
-                Colour::Blue.paint("Info:"),
-                &trash_path.trash_files_dir.display()
-            );
+            println!("{} {} is empty", "Info:".blue(), &trash_path.trash_files_dir.display());
             std::process::exit(0);
         }
 
@@ -85,7 +77,7 @@ impl TrashDirPaths {
             let answer = dialoguer::Confirm::new()
                 .with_prompt(format!(
                     "{} Permanently delete all {} files at {}?",
-                    Colour::Red.paint("Warn:"),
+                    "Warn:".red(),
                     number_of_files,
                     &trash_path.trash_files_dir.display()
                 ))
@@ -101,16 +93,16 @@ impl TrashDirPaths {
         if GLOBAL.verbose() {
             println!(
                 "{} Deleting {} files in {:?}",
-                Colour::Blue.paint("Info:"),
+                "Info:".blue(),
                 number_of_files,
                 &trash_path.trash_files_dir
             );
         }
 
         if let Err(e) = Self::remove_default_dirs(&trash_path.trash_info_dir, &trash_path.trash_files_dir) {
-            eprintln!("{} Unable to remove Trash. {}", Colour::Red.paint("Err:"), e);
+            eprintln!("{} Unable to remove Trash. {}", "Err:".red(), e);
         } else if let Err(e) = Self::create_default_dirs(&trash_path.trash_info_dir, &trash_path.trash_files_dir) {
-            eprintln!("{} Unable to recreate default Trash. {}", Colour::Red.paint("Err:"), e);
+            eprintln!("{} Unable to recreate default Trash. {}", "Err:".red(), e);
         }
     }
 

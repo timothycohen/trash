@@ -2,7 +2,7 @@ use crate::{
     global::GLOBAL, trash::overwrite_guard, trash_dir_paths::TrashDirPaths, trash_info::TrashInfo,
     trash_names::TrashNames,
 };
-use ansi_term::Colour;
+use colored::Colorize;
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -40,7 +40,7 @@ impl AbsoluteTrashPaths {
         if !self.trash_file_path.exists() {
             eprintln!(
                 "{} Trash file path does not exist: {:?}",
-                Colour::Red.paint("Error:"),
+                "error:".red(),
                 self.trash_file_path
             );
             std::process::exit(1);
@@ -48,7 +48,7 @@ impl AbsoluteTrashPaths {
         if !self.trash_info_path.exists() {
             eprintln!(
                 "{} Trash info path does not exist: {:?}",
-                Colour::Red.paint("Error:"),
+                "error:".red(),
                 self.trash_info_path
             );
             std::process::exit(1);
@@ -62,7 +62,7 @@ impl AbsoluteTrashPaths {
         if GLOBAL.verbose() {
             println!(
                 "{} Checking trash info files for the path_string {}",
-                Colour::Blue.paint("Info:"),
+                "Info:".blue(),
                 path_string
             );
         }
@@ -103,7 +103,7 @@ impl AbsoluteTrashPaths {
         if GLOBAL.verbose() {
             println!(
                 "{} Removing info file at {}",
-                Colour::Blue.paint("Info:"),
+                "Info:".blue(),
                 self.trash_info_path.display()
             );
         }
@@ -119,7 +119,7 @@ impl AbsoluteTrashPaths {
         if GLOBAL.verbose() {
             println!(
                 "{} Moving trashed file to {}",
-                Colour::Blue.paint("Info:"),
+                "Info:".blue(),
                 self.trash_file_path.display()
             );
         }
@@ -138,7 +138,7 @@ impl AbsoluteTrashPaths {
         if GLOBAL.verbose() {
             println!(
                 "{} Writing info file to {}",
-                Colour::Blue.paint("Info:"),
+                "Info:".blue(),
                 self.trash_info_path.display()
             );
         }
@@ -154,20 +154,20 @@ impl AbsoluteTrashPaths {
         if let Err(trash_paths_error) = maybe_error {
             match trash_paths_error {
                 AbsoluteTrashPathsError::DeleteInfo(e) => {
-                    eprintln!("{} Could not remove info file. {:?}", Colour::Red.paint("Err:"), e);
+                    eprintln!("{} Could not remove info file. {:?}", "Err:".red(), e);
                     std::process::exit(1)
                 }
                 AbsoluteTrashPathsError::WriteInfo(e) => {
-                    eprintln!("{} Could not write info file. {:?}", Colour::Red.paint("Err:"), e);
+                    eprintln!("{} Could not write info file. {:?}", "Err:".red(), e);
                     std::process::exit(1)
                 }
                 AbsoluteTrashPathsError::TrashFile(e, trash_paths) => {
-                    eprintln!("{} Could not move trashed file. {:?}", Colour::Red.paint("Err:"), e);
+                    eprintln!("{} Could not move trashed file. {:?}", "Err:".red(), e);
                     trash_paths.delete_info_file();
                     std::process::exit(1)
                 }
                 AbsoluteTrashPathsError::RestoreFile(e) => {
-                    eprintln!("{} Could not restore trashed file. {:?}", Colour::Red.paint("Err:"), e);
+                    eprintln!("{} Could not restore trashed file. {:?}", "Err:".red(), e);
                     std::process::exit(1)
                 }
             }
@@ -176,11 +176,7 @@ impl AbsoluteTrashPaths {
 
     pub fn try_restore_from_trash(&self, source_path: &Path) -> AbsoluteTrashPathsResult {
         if GLOBAL.verbose() {
-            println!(
-                "{} Restoring trashed file to {}",
-                Colour::Blue.paint("Info:"),
-                source_path.display()
-            );
+            println!("{} Restoring trashed file to {}", "Info:".blue(), source_path.display());
         }
 
         std::fs::rename(&self.trash_file_path, source_path).map_err(AbsoluteTrashPathsError::RestoreFile)
