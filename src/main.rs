@@ -59,7 +59,7 @@ fn main() {
     };
 }
 
-pub fn path_arg_guard(user_path: &Vec<String>) {
+pub fn path_arg_guard(user_path: &[String]) {
     if user_path.is_empty() {
         eprintln!("{} The following arguments are required:", Colour::Red.paint("error:"));
         eprintln!("    {}\n", Colour::Green.paint("[FILE]"));

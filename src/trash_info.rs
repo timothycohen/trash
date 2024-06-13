@@ -96,7 +96,7 @@ impl TrashInfo {
     }
 
     pub fn from_file(source_path: &Path) -> Result<TrashInfo, Box<dyn std::error::Error + Send + Sync + 'static>> {
-        let file = std::fs::read_to_string(&source_path)?;
+        let file = std::fs::read_to_string(source_path)?;
         let mut lines = file.lines();
 
         lines
